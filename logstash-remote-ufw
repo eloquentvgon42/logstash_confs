@@ -1,0 +1,27 @@
+input {
+tcp {
+  port => 5000
+  type => syslog
+}
+udp {
+  port => 5000
+  type => syslog
+ }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:ufw_timestamp} %{SYSLOGHOST:ufw_hostname} %{DATA:ufw_program}(?:\[%{POSINT:ufw_pid}\])?: %{GREEDYDATA:ufw_message}" }
+    }
+}
+    grok {
+      match => { "ufw_message" => "\[%{DATA}\] \[UFW %{WORD:ufw_action}\] IN=%{DATA:ufw_interface} OUT= MAC=%{DATA:ufw_mac} SRC=%{IP:ufw_src_ip} DST=%{IP:ufw_dest_ip} %{GREEDYDATA:ufw_tcp_opts} PROTO=%{
+WORD:ufw_protocol} SPT=%{INT:ufw_src_port} DPT=%{INT:ufw_dst_port} %{GREEDYDATA:ufw_tcp_opts}"
+    }
+  }
+}
+output {
+  elasticsearch { hosts => ["localhost:9200"] }
+  stdout { codec => rubydebug }
+}
