@@ -1,11 +1,11 @@
 input {
-        file {
+    file {
     path => "/var/log/syslog"
-        type => "syslog"
+      type => "syslog"
   }
-        file {
+    file {
     path => "/var/log/ufw.log"
-        type => "ufwlog"
+      type => "ufwlog"
   }
 }
 
